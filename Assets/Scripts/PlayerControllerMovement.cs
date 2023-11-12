@@ -56,6 +56,7 @@ public class PlayerControllerMovement : MonoBehaviour
         
         Vector3 pos = this.transform.position;
         pos.x = x;
+        pos.z = 10;
         transform.position = Vector3.MoveTowards(this.transform.position, pos, 0.5f);
     }
 
@@ -68,7 +69,7 @@ public class PlayerControllerMovement : MonoBehaviour
         // y -= gravity * -2f * Time.deltaTime;
         if (controller.isGrounded)
         {
-            velocity.y -= 1f;
+            velocity.y = -500 * Time.deltaTime;
 
             if (Input.GetKeyDown(KeyCode.Space))
             {
