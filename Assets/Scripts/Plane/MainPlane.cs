@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -10,7 +11,7 @@ public class MainPlane : MonoBehaviour
     [Space]
     public Transform otherPlane;
     public Transform model;
-    public Transform currentModun;
+    public ChuongNgaiVat obstacle;
 
     void Start()
     { 
@@ -35,7 +36,7 @@ public class MainPlane : MonoBehaviour
 
         if (temp <= -200)
         {
-            transform.position = new Vector3(0,0, otherPlane.position.z + 200);
+            transform.position = new Vector3(0,0, otherPlane.position.z + 200 - 1);
             OnResetChill();
         }
     }
@@ -45,18 +46,17 @@ public class MainPlane : MonoBehaviour
         Debug.Log(("Reset children " + this.name, transform));
 
         // Chuyển modun hiện tại qua plane container
-        if(this.currentModun)
+        if(this.obstacle)
         {
-            this.currentModun.SetParent(planeContainer.model);
-            this.currentModun.localPosition = Vector3.zero;
-            this.currentModun.gameObject.SetActive(false);
+            planeContainer.giveBackObstacle(this.obstacle, this);
         }
 
         // lấy ngẫu nhiên modun mới từ plane container bỏ vào đây
-        this.currentModun = planeContainer.getRandomModun();
-        this.currentModun.SetParent(this.model);
-        this.currentModun.localPosition = Vector3.zero;
-        this.currentModun.gameObject.SetActive(true);
+        this.obstacle = planeContainer.getObstacle();
+        this.obstacle.transform.SetParent(this.model);
+        this.obstacle.parentPlane = this;
+        this.obstacle.transform.localPosition = Vector3.zero;
+        this.obstacle.gameObject.SetActive(true);
 
     }
 }
