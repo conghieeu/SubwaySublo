@@ -5,15 +5,14 @@ using UnityEngine;
 
 public class UIEndGame : MonoBehaviour
 {
-    public TMP_Text txtNewRecord;
 
     public void GoOnMenu()
     {
         Debug.Log("Go On Menu");
     }
 
-    public void SetTxtNewRecord(float time)
+    public void BtnRestart()
     {
-        
+        LevelManager.Instance.ReloadCurrentScene();
     }
 }

@@ -31,7 +31,7 @@ public class PlayerCtrl : MonoBehaviour
 
 
     }
- 
+
     void Start()
     {
         indexX = 1;
@@ -39,14 +39,17 @@ public class PlayerCtrl : MonoBehaviour
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
         controller = GetComponent<CharacterController>();
     }
- 
+
     void Update()
     {
+        if (GameManager.Instance.isPaused) return;
+        
         if (isDeath == false)
         {
             ControlPlayer();
             MoveX();
             Roll();
+
         }
         else // PLAYER DEATH
         {
@@ -58,8 +61,8 @@ public class PlayerCtrl : MonoBehaviour
     {
         velocity.y -= gravity * fallSpeed * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
-        
-        Gameplay.Instance.EndGame();
+
+        GameManager.Instance.EndGame();
     }
 
     public void SetDeathState()
