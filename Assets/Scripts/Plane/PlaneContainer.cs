@@ -56,7 +56,7 @@ public class PlaneContainer : MonoBehaviour
     public void giveBackObstacle(ChuongNgaiVat obstacle, MainPlane plane)
     {
         obstacle.gameObject.SetActive(false);
-        obstacle.transform.SetParent(plane.model);
+        obstacle.transform.SetParent(plane.Model);
         obstacle.parentPlane = null;
     }
 }
