@@ -14,6 +14,7 @@ public class PlayerCtrl : MonoBehaviour
     CharacterController controller;
 
     [Space]
+    [SerializeField] bool isPauseGame;
     [SerializeField] bool isDeath;
     [SerializeField] float speed;
     [SerializeField] float jumpForce = 15;
@@ -29,7 +30,6 @@ public class PlayerCtrl : MonoBehaviour
         if (Instance != null && Instance != this) Destroy(this);
         else Instance = this;
 
-
     }
 
     void Start()
@@ -42,19 +42,24 @@ public class PlayerCtrl : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.Instance.isPaused) return;
-        
         if (isDeath == false)
         {
-            ControlPlayer();
-            MoveX();
-            Roll();
-
+            if (isPauseGame == false)
+            {
+                ControlPlayer();
+                MoveX();
+                Roll();
+            }
         }
         else // PLAYER DEATH
         {
             Death();
         }
+    }
+
+    public void SetPauseGame(bool value)
+    {
+        isPauseGame = value;
     }
 
     private void Death()

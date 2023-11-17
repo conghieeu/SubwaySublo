@@ -18,6 +18,9 @@ namespace PauseManagement.Core
 	/// </summary>
 	public class PauseManager : MonoBehaviour
 	{
+		public static PauseManager Instance { get; private set; }
+
+
 		public const string Version = "1.4.0";
 
 		public delegate void PauseDelegateAction(bool paused);
@@ -200,6 +203,9 @@ namespace PauseManagement.Core
 		// Awake is called before Start function
 		void Awake()
 		{
+			if (Instance != null && Instance != this) Destroy(this);
+			else Instance = this;
+
 #if PAUSE_MANAGER_INPUT_SYSTEM
 			if (useUnityInputSystem)
 			{
