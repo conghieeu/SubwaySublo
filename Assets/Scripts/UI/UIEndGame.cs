@@ -5,14 +5,13 @@ using UnityEngine;
 
 public class UIEndGame : MonoBehaviour
 {
-
     public void GoOnMenu()
     {
-        Debug.Log("Go On Menu");
+        GameManager.Instance.OnGoToMenu();
     }
 
     public void BtnRestart()
     {
-        LevelManager.Instance.ReloadCurrentScene();
+           
     }
 }

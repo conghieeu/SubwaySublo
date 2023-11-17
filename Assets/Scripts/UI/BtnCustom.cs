@@ -6,13 +6,55 @@ using UnityEngine.EventSystems;
 
 public class BtnCustom : MonoBehaviour
 {
-    private Button button;
-    private Vector3 originalScale;
-    private AudioSource audioSource;
-
+    [SerializeField] Transform whoCallThis;
     public AudioClip hoverSound;
 
+    [Space]
+    [Tooltip("Đây là đối tượng nó sẽ kích hoạt hoặc tắt đi khi nhấn vào và điều kiện của nó là isActiveOther")]
+    [SerializeField] Transform otherActive;
+    [SerializeField] BtnCustom otherBtnBack;
+    [SerializeField] Transform thisMainUI; // là giao diện cha lưu trữ thằng này
+    [SerializeField] bool isActiveOther = true;
+    [SerializeField] bool isThisSwitch;
+
+    Button button;
+    Vector3 originalScale;
+    AudioSource audioSource;
+
+    public Transform WhoCallThis { get => whoCallThis; set => whoCallThis = value; }
+
     void Start()
+    {
+        SetPointerEnter();
+    }
+
+    public void GoBack()
+    {
+        otherActive = WhoCallThis;
+        SetActiveOther();
+    }
+
+    public void SetActiveOther()
+    {
+        if (isThisSwitch)
+        {
+            isActiveOther = !isActiveOther;
+        }
+
+        otherActive.gameObject.SetActive(isActiveOther);
+
+        if (thisMainUI)
+        {
+            thisMainUI.gameObject.SetActive(!isActiveOther);
+
+            if (otherBtnBack)
+                otherBtnBack.WhoCallThis = thisMainUI;
+        }
+
+
+    }
+
+    void SetPointerEnter()
     {
         // Lấy tham chiếu đến Button component
         button = GetComponent<Button>();
@@ -55,4 +97,6 @@ public class BtnCustom : MonoBehaviour
         // Khi con trỏ chuột ra khỏi, khôi phục kích thước ban đầu của button
         transform.localScale = originalScale;
     }
+
+
 }

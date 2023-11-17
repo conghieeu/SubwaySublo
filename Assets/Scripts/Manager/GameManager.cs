@@ -7,7 +7,7 @@ using Cinemachine;
 public class GameManager : MonoBehaviour
 {
     public bool isPaused = false;
-    
+
     [SerializeField] TMP_Text txtTimer;
     [SerializeField] TMP_Text txtYourTime;
     [SerializeField] TMP_Text txtBestRecord;
@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] bool isEndGame = false;
 
     public static GameManager Instance { get; private set; }
+    public bool IsEndGame { get => isEndGame; set => isEndGame = value; }
 
     private void Awake()
     {
@@ -36,9 +37,8 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        UIEndGame.gameObject.SetActive(false);
-
-        playerVirtualCamera.gameObject.SetActive(true);
+        isPaused = true;
+        TogglePause();
     }
 
     void Update()
@@ -52,7 +52,24 @@ public class GameManager : MonoBehaviour
         CountTime();
     }
 
-    public string TimeToString(float time)
+    public void OnGameStart()
+    {
+        playerVirtualCamera.gameObject.SetActive(true);
+        menuVirtualCamera.gameObject.SetActive(false);
+    }
+
+    public void OnGoToMenu()
+    {
+        playerVirtualCamera.gameObject.SetActive(false);
+        menuVirtualCamera.gameObject.SetActive(true);
+    }
+
+    public void PlayerStartRun()
+    {
+        Time.timeScale = 1f;
+    }
+
+    public string FloatToTime(float time)
     {
         // Kiểm tra nếu thời gian tích lũy vượt quá thời gian tối đa, giữ nó ở thời gian tối đa
         time = Mathf.Min(time, totalTime);
@@ -68,19 +85,11 @@ public class GameManager : MonoBehaviour
         return timerString;
     }
 
-    public float LoadElapsedTime()
-    {
-        // Lấy giá trị từ PlayerPrefs bằng khóa (key)
-        float loadedValue = PlayerPrefs.GetFloat("Highscore");
-
-        // Trả về giá trị đã lưu hoặc giá trị mặc định là 0 nếu không có dữ liệu
-        return loadedValue;
-    }
-
     public void EndGame()
     {
-        if (isEndGame) return;
-        isEndGame = true;
+        if (IsEndGame) return;
+        IsEndGame = true;
+        float elapsedTimeSaved = SavePrefabs.Instance.LoadValue(SavePrefabs.SaveKeys.Highscore);
 
         Debug.Log("END GAME!!");
 
@@ -88,13 +97,14 @@ public class GameManager : MonoBehaviour
         UIEndGame.gameObject.SetActive(true);
         UIEndGame.GetComponent<Animator>().SetBool("IsEnd", true);
 
-        if (elapsedTime > LoadElapsedTime())
+        if (elapsedTime > elapsedTimeSaved)
         {
-            SaveElapsedTime();
+            SavePrefabs.Instance.SaveValue(SavePrefabs.SaveKeys.Highscore, elapsedTime);
+            elapsedTimeSaved = elapsedTime;
         }
 
-        txtYourTime.text = "Your time: " + TimeToString(elapsedTime);
-        txtBestRecord.text = "Best record: " + TimeToString(LoadElapsedTime());
+        txtYourTime.text = "Your time: " + FloatToTime(elapsedTime);
+        txtBestRecord.text = "Best record: " + FloatToTime(elapsedTimeSaved);
     }
 
     void TogglePause()
@@ -114,23 +124,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void SaveElapsedTime()
-    {
-        // Lưu giá trị vào PlayerPrefs với một khóa (key)
-        PlayerPrefs.SetFloat("Highscore", elapsedTime);
-
-        // Lưu thay đổi
-        PlayerPrefs.Save();
-    }
 
     void CountTime()
     {
-        if (isEndGame) return;
+        if (IsEndGame) return;
 
         // Tăng thời gian tích lũy theo thời gian thực (Time.fixedDeltaTime)
         elapsedTime += Time.fixedDeltaTime;
 
-        txtTimer.text = TimeToString(elapsedTime);
+        txtTimer.text = FloatToTime(elapsedTime);
     }
 
 }
