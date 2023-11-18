@@ -10,14 +10,16 @@ public class MainPlane : MonoBehaviour
     [SerializeField] PlaneContainer planeContainer;
 
     [Space]
+    [SerializeField] bool isThisStartPlane;
+    [SerializeField] float endPos;
+    [SerializeField] float length;
     [SerializeField] float speed;
     [SerializeField] float maxSpeed = 100f;
     [SerializeField] float speedAcceleration = 1f; // Tốc độ tăng lên
-    [SerializeField] Transform otherPlane;
-    [SerializeField] Transform model;
+    [SerializeField] MainPlane nextPlane;
     [SerializeField] ChuongNgaiVat obstacle;
 
-    public Transform Model { get => model; set => model = value; }
+    public MainPlane NextPlane { get => nextPlane; set => nextPlane = value; }
 
     void Start()
     {
@@ -59,32 +61,33 @@ public class MainPlane : MonoBehaviour
 
     void ParallaxEffect()
     {
-        float temp = transform.position.z;
+        if (transform.position.z > endPos) return;
 
-        if (temp <= -200)
-        {
-            transform.position = new Vector3(0, 0, otherPlane.position.z + 200 - 1);
-            OnResetChill();
-        }
-    }
+        Debug.Log(("Reset vị trí cái plane này: " + this.name, transform));
 
-    void OnResetChill()
-    {
-        Debug.Log(("Reset children " + this.name, transform));
+        nextPlane = planeCtrl.getTheLastPlane();
+        // Debug.Log(nextPlane.NextPlane, nextPlane.NextPlane.transform);
 
-        // Chuyển modun hiện tại qua plane container
+        transform.position = new Vector3(0, 0, nextPlane.transform.position.z + length - 0.5f);
+
+
         if (this.obstacle)
         {
-            planeContainer.giveBackObstacle(this.obstacle, this);
+            planeContainer.addObstacle(this.obstacle);
         }
 
         // lấy ngẫu nhiên modun mới từ plane container bỏ vào đây
-        this.obstacle = planeContainer.getObstacle();
-        this.obstacle.transform.SetParent(this.Model);
+        this.obstacle = planeContainer.getObstacle(isThisStartPlane);
+        this.obstacle.transform.SetParent(this.transform);
         this.obstacle.parentPlane = this;
         this.obstacle.transform.localPosition = Vector3.zero;
         this.obstacle.gameObject.SetActive(true);
 
+        isThisStartPlane = false;
+
+        nextPlane.NextPlane = this;
+        nextPlane = null;
     }
+
 }
 

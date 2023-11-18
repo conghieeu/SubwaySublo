@@ -4,59 +4,36 @@ using UnityEngine;
 
 public class PlaneContainer : MonoBehaviour
 {
-    [SerializeField] List<ChuongNgaiVat> obstacles = new List<ChuongNgaiVat>();
-    [SerializeField] List<ChuongNgaiVat> startObstacles = new List<ChuongNgaiVat>();
+    public List<ChuongNgaiVat> obstacles = new List<ChuongNgaiVat>();
 
-    public Transform model;
-
-    public ChuongNgaiVat getStartObstacle()
+    public ChuongNgaiVat getObstacle(bool isStartObstacle)
     {
-        if (startObstacles.Count <= 1)
-        {
-            Debug.LogWarning("Cảnh báo: Đang chỉ có một chướng ngại vật mẫu");
-            return startObstacles[0];
-        }
+        if (obstacles.Count <= 0) return null;
 
         ChuongNgaiVat cnv = null;
 
-        do
-        {
-            int r = Random.Range(0, startObstacles.Count);
-
-            if (this.startObstacles[r].parentPlane == null)
-                cnv = this.startObstacles[r];
-        }
-        while (cnv == null);
-
-        return cnv;
-    }
-
-    public ChuongNgaiVat getObstacle()
-    {
-        if (obstacles.Count <= 1)
-        {
-            Debug.LogWarning("Cảnh báo: Đang chỉ có một chướng ngại vật mẫu");
-            return obstacles[0];
-        }
-
-        ChuongNgaiVat cnv = null;
-
-        do
+        for (int i = 0; i < 200; i++)
         {
             int r = Random.Range(0, obstacles.Count);
 
-            if (this.obstacles[r].parentPlane == null)
-                cnv = this.obstacles[r];
+            if (obstacles[r].isThisStartObstacle == isStartObstacle)
+            {
+                cnv = obstacles[r];
+                break;
+            }
         }
-        while (cnv == null);
+
+        obstacles.Remove(cnv);
 
         return cnv;
     }
 
-    public void giveBackObstacle(ChuongNgaiVat obstacle, MainPlane plane)
+    /// <summary> Trả Obstacle lại về kho </summary>
+    public void addObstacle(ChuongNgaiVat obstacle)
     {
         obstacle.gameObject.SetActive(false);
-        obstacle.transform.SetParent(plane.Model);
+        obstacle.transform.SetParent(this.transform);
+        obstacles.Add(obstacle);
         obstacle.parentPlane = null;
     }
 }

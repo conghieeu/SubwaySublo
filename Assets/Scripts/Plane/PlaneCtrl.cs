@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlaneCtrl : MonoBehaviour
 {
     [SerializeField] bool isStopMovePlane;
+    [SerializeField] List<MainPlane> mainPlanes;
 
     public static PlaneCtrl Instance { get; private set; }
     public bool IsStopMovePlane { get => isStopMovePlane; set => isStopMovePlane = value; }
@@ -15,5 +16,17 @@ public class PlaneCtrl : MonoBehaviour
         else Instance = this;
 
     }
-    
+
+    /// <summary> Lấy thằng Plane đang nằm cuối </summary>
+    public MainPlane getTheLastPlane()
+    {
+        foreach (var p in mainPlanes)
+        {
+            if(p.NextPlane == null)  {
+                return p;
+            }
+        }
+        return null;
+    }
+
 }

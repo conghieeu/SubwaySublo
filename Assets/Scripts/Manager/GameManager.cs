@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         PauseManager.Instance.TogglePause();
+        PauseManager.Instance.enabled = false;
     }
 
 
@@ -58,7 +59,6 @@ public class GameManager : MonoBehaviour
 
         timer.OnEndGame();
         endGame.OnEndGame();
-        PauseManager.Instance.TogglePause();
 
     }
 }

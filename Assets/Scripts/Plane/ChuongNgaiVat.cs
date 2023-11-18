@@ -5,4 +5,5 @@ using UnityEngine;
 public class ChuongNgaiVat : MonoBehaviour
 {
     public MainPlane parentPlane;
+    public bool isThisStartObstacle;
 }
