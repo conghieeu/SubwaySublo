@@ -11,7 +11,8 @@ public class PlayerCtrl : MonoBehaviour
     int indexX;
     PlayerAnimator playerAnimator;
     Transform playerCamera;
-    CharacterController controller;
+    CharacterController charCtrl;
+    [SerializeField] PlayerDeathColl playerDeath;
 
     [Space]
     [SerializeField] bool isPauseGame;
@@ -37,7 +38,8 @@ public class PlayerCtrl : MonoBehaviour
         indexX = 1;
         fallSpeed = -500;
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
-        controller = GetComponent<CharacterController>();
+        playerDeath = GetComponentInChildren<PlayerDeathColl>();
+        charCtrl = GetComponent<CharacterController>();
     }
 
     void Update()
@@ -65,7 +67,7 @@ public class PlayerCtrl : MonoBehaviour
     private void Death()
     {
         velocity.y -= gravity * fallSpeed * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+        charCtrl.Move(velocity * Time.deltaTime);
 
         GameManager.Instance.EndGame();
     }
@@ -83,7 +85,25 @@ public class PlayerCtrl : MonoBehaviour
         {
             fallSpeed = -20;
             playerAnimator.RunRollingAnimation();
+
+            // Setting charCtrl
+            charCtrl.center = new Vector3(0, -0.5f, 0);
+            charCtrl.height = 0.5f;
+            // setting boxCast_death
+            playerDeath.transform.localPosition = new Vector3(0, -0.5f, 0);
+            playerDeath.BoxSize = new Vector3(0.3f, 0.25f, 0.3f);
+
         }
+    }
+
+    public void EndRoll()
+    {
+        // Setting charCtrl
+        charCtrl.center = new Vector3(0, 0, 0);
+        charCtrl.height = 1; 
+        // setting boxCast_death
+        playerDeath.transform.localPosition = new Vector3(0, 0f, 0);
+        playerDeath.BoxSize = new Vector3(0.3f, 0.5f, 0.3f);
     }
 
     void MoveX()
@@ -131,7 +151,7 @@ public class PlayerCtrl : MonoBehaviour
         PlayerMovementInput = new Vector3(0f, 0f, 1);
 
         // y -= gravity * -2f * Time.deltaTime;
-        if (controller.isGrounded)
+        if (charCtrl.isGrounded)
         {
             velocity.y = -500 * Time.deltaTime;
             fallSpeed = -2;
@@ -156,8 +176,8 @@ public class PlayerCtrl : MonoBehaviour
             velocity.y -= gravity * fallSpeed * Time.deltaTime;
         }
 
-        controller.Move(moveVector * speed * Time.deltaTime);
-        controller.Move(velocity * Time.deltaTime);
+        charCtrl.Move(moveVector * speed * Time.deltaTime);
+        charCtrl.Move(velocity * Time.deltaTime);
     }
 
     void MovePlayerCamera()

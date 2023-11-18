@@ -17,14 +17,14 @@ public class PlayerAnimator : MonoBehaviour
     private state playerState = state.running;
     private state playerStateTemp;
 
-    PlayerCtrl playerController;
+    PlayerCtrl playerCtrl;
     Animator animator;
 
     public state PlayerState { get => playerState; set => playerState = value; }
 
     void Start()
     {
-        playerController = GetComponentInParent<PlayerCtrl>();
+        playerCtrl = GetComponentInParent<PlayerCtrl>();
         animator = GetComponent<Animator>();
     }
 
@@ -57,6 +57,12 @@ public class PlayerAnimator : MonoBehaviour
     {
         PlayerState = state.rightTurn;
         setAnimation();
+    }
+
+    public void OnStopRoll()
+    {
+        RunRunningAnimation();
+        playerCtrl.EndRoll();
     }
 
     public void RunJumpAnimation()

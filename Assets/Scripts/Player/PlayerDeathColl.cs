@@ -10,6 +10,8 @@ public class PlayerDeathColl : MonoBehaviour
     [SerializeField] string targetTag; // Tag của đối tượng muốn phát hiện
     [SerializeField] Vector3 boxSize;
 
+    public Vector3 BoxSize { get => boxSize; set => boxSize = value; }
+
     void Start()
     {
         playerCtrl = GetComponentInParent<PlayerCtrl>();
@@ -32,7 +34,7 @@ public class PlayerDeathColl : MonoBehaviour
     protected bool BoxCastHit(string tag)
     {
         // Sử dụng Boxcast
-        RaycastHit[] boxcastHits = Physics.BoxCastAll(transform.position, boxSize / 2f, transform.forward, Quaternion.identity, 0f);
+        RaycastHit[] boxcastHits = Physics.BoxCastAll(transform.position, BoxSize / 2f, transform.forward, Quaternion.identity, 0f);
         foreach (RaycastHit hit in boxcastHits)
         {
             if (hit.collider.CompareTag(targetTag))
@@ -47,7 +49,7 @@ public class PlayerDeathColl : MonoBehaviour
     protected void OnDrawGizmosSelected()
     {
         // Vẽ Boxcast
-        Gizmos.DrawWireCube(transform.position, boxSize);
+        Gizmos.DrawWireCube(transform.position, BoxSize);
     }
 
 }
