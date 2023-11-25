@@ -26,7 +26,6 @@ public class PlayerDeathColl : MonoBehaviour
     {
         if (BoxCastHit(targetTag))
         {
-            print("Player Death");
             playerCtrl.SetDeathState();
         }
     }

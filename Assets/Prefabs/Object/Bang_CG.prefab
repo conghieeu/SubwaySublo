@@ -61,7 +61,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: ec35008fddf2b0443a13b76268ebaa23,
         type: 3}
       propertyPath: m_Name
-      value: BangChanGiua
+      value: Bang_CG
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: ec35008fddf2b0443a13b76268ebaa23,
         type: 3}
@@ -102,5 +102,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.3628515, y: 0.3371911, z: 0.3420295}
-  m_Center: {x: -0.0024189353, y: 0.84423447, z: 0.067732245}
+  m_Size: {x: 1.3628515, y: 0.37010217, z: 0.5125732}
+  m_Center: {x: -0.0024189353, y: 0.82777894, z: 0.08969548}

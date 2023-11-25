@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using PauseManagement.Core;
 using UnityEngine;
 
 public class PlayerCtrl : MonoBehaviour
@@ -13,24 +14,23 @@ public class PlayerCtrl : MonoBehaviour
     Transform playerCamera;
     CharacterController charCtrl;
     [SerializeField] PlayerDeathColl playerDeath;
+    [SerializeField] PlayerAudio playerAudio;
 
     [Space]
-    [SerializeField] bool isPauseGame;
     [SerializeField] bool isDeath;
     [SerializeField] float speed;
     [SerializeField] float jumpForce = 15;
-    [SerializeField] float cameraSensitivity;
     [SerializeField] float gravity = -20;
     [SerializeField] float fallSpeed = 20;
     [SerializeField] float moveXSpeed = 90;
 
     public static PlayerCtrl Instance { get; private set; }
+    public PlayerAudio PlayerAudio { get => playerAudio; set => playerAudio = value; }
 
     private void Awake()
     {
         if (Instance != null && Instance != this) Destroy(this);
         else Instance = this;
-
     }
 
     void Start()
@@ -39,28 +39,24 @@ public class PlayerCtrl : MonoBehaviour
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
         playerDeath = GetComponentInChildren<PlayerDeathColl>();
         charCtrl = GetComponent<CharacterController>();
+        PlayerAudio = GetComponentInChildren<PlayerAudio>();
     }
 
     void Update()
     {
         if (isDeath == false)
         {
-            if (isPauseGame == false)
+            if (!PauseManager.IsPaused)
             {
                 ControlPlayer();
                 MoveX();
-                Roll();
+                OnStartRoll();
             }
         }
-        else // PLAYER DEATH
+        else
         {
             Death();
         }
-    }
-
-    public void SetPauseGame(bool value)
-    {
-        isPauseGame = value;
     }
 
     private void Death()
@@ -76,14 +72,18 @@ public class PlayerCtrl : MonoBehaviour
         PlaneCtrl.Instance.IsStopMovePlane = true;
         isDeath = true;
         playerAnimator.RunDeathAnimation();
+
+        print("Player Death");
+        PlayAudio(PlayerAudio.DeathClip, false);
     }
 
-    void Roll()
+    void OnStartRoll()
     {
         if (Input.GetKeyDown(KeyCode.S))
         {
             fallSpeed = -20;
             playerAnimator.RunRollingAnimation();
+            PlayAudio(PlayerAudio.FallClip, false);
 
             // Setting charCtrl
             charCtrl.center = new Vector3(0, -0.5f, 0);
@@ -95,11 +95,11 @@ public class PlayerCtrl : MonoBehaviour
         }
     }
 
-    public void EndRoll()
+    public void OnEndRoll()
     {
         // Setting charCtrl
         charCtrl.center = new Vector3(0, 0, 0);
-        charCtrl.height = 1; 
+        charCtrl.height = 1;
         // setting boxCast_death
         playerDeath.transform.localPosition = new Vector3(0, 0f, 0);
         playerDeath.BoxSize = new Vector3(0.3f, 0.5f, 0.3f);
@@ -115,11 +115,13 @@ public class PlayerCtrl : MonoBehaviour
         {
             dir = -1;
             playerAnimator.RunTurnLeftAnimation();
+            PlayAudio(PlayerAudio.MoveClip, false);
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
             dir = 1;
             playerAnimator.RunTurnRightAnimation();
+            PlayAudio(PlayerAudio.MoveClip, false);
         }
 
         float x = this.transform.position.x;
@@ -140,7 +142,10 @@ public class PlayerCtrl : MonoBehaviour
         {
             if (playerAnimator.PlayerState == PlayerAnimator.state.leftTurn ||
                 playerAnimator.PlayerState == PlayerAnimator.state.rightTurn)
+            {
                 playerAnimator.RunRunningAnimation();
+                PlayerAudio.PlayAudio(PlayerAudio.RunClip, true);
+            }
         }
     }
 
@@ -158,6 +163,7 @@ public class PlayerCtrl : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 velocity.y = jumpForce;
+                PlayAudio(PlayerAudio.JumpClip, false);
             }
 
             if (playerAnimator.PlayerState == PlayerAnimator.state.jumping)
@@ -177,12 +183,9 @@ public class PlayerCtrl : MonoBehaviour
 
         charCtrl.Move(moveVector * speed * Time.deltaTime);
         charCtrl.Move(velocity * Time.deltaTime);
+
     }
 
-    void MovePlayerCamera()
-    {
-        xRot -= PlayerMouseInput.y;
-        transform.Rotate(0f, PlayerMouseInput.x * cameraSensitivity, 0f);
-        playerCamera.transform.localRotation = Quaternion.Euler(xRot, 0f, 0f);
-    }
+    void PlayAudio(AudioClip clip, bool isLoop) => PlayerAudio.PlayAudio(clip, isLoop);
+
 }

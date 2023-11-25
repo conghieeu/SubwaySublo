@@ -28,6 +28,11 @@ public class PlayerAnimator : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
+    public void PlayAudioRun()
+    {
+        playerCtrl.PlayerAudio.PlayAudioRunClip();
+    }
+
     public void RunDeathAnimation()
     {
         playerState = state.death;
@@ -62,7 +67,7 @@ public class PlayerAnimator : MonoBehaviour
     public void OnStopRoll()
     {
         RunRunningAnimation();
-        playerCtrl.EndRoll();
+        playerCtrl.OnEndRoll();
     }
 
     public void RunJumpAnimation()
