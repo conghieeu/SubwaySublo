@@ -17,9 +17,11 @@ public class MainPlane : MonoBehaviour
     [SerializeField] float maxSpeed = 100f;
     [SerializeField] float speedAcceleration = 1f; // Tốc độ tăng lên
     [SerializeField] MainPlane nextPlane;
+    [SerializeField] MainPlane backPlane;
     [SerializeField] ChuongNgaiVat obstacle;
 
     public MainPlane NextPlane { get => nextPlane; set => nextPlane = value; }
+    public MainPlane BackPlane { get => backPlane; set => backPlane = value; }
 
     void Start()
     {
@@ -29,7 +31,7 @@ public class MainPlane : MonoBehaviour
     void FixedUpdate()
     {
         Move();
-        ParallaxEffect();
+        ResetPlanePos();
         IncreaseSpeed();
     }
 
@@ -43,33 +45,23 @@ public class MainPlane : MonoBehaviour
 
     void IncreaseSpeed()
     {
-        // Tăng tốc độ dựa trên thời gian và tốc độ tăng lên
-        speed += speedAcceleration * Time.fixedDeltaTime;
-
-        // Giữ tốc độ trong khoảng từ 0 đến maxSpeed
-        speed = Mathf.Clamp(speed, 0f, maxSpeed);
-
-        // Áp dụng tốc độ vào nơi bạn muốn sử dụng nó trong game
-        // Ví dụ: transform.Translate(Vector3.forward * currentSpeed * Time.fixedDeltaTime);
-
-        // Kiểm tra xem tốc độ đã đạt đến giá trị tối đa hay chưa
-        if (speed >= maxSpeed)
+        if (speed < maxSpeed)
         {
-            // Tốc độ đã đạt giá trị tối đa, có thể thực hiện các hành động cần thiết ở đây
+            speed += speedAcceleration * Time.fixedDeltaTime;
         }
     }
 
-    void ParallaxEffect()
+    void ResetPlanePos()
     {
         if (transform.position.z > endPos) return;
 
         Debug.Log(("Reset vị trí cái plane này: " + this.name, transform));
 
-        nextPlane = planeCtrl.getTheLastPlane();
-        // Debug.Log(nextPlane.NextPlane, nextPlane.NextPlane.transform);
+        MainPlane lastPlane = planeCtrl.getTheLastPlane();
 
-        transform.position = new Vector3(0, 0, nextPlane.transform.position.z + length - 0.5f);
+        
 
+        transform.position = new Vector3(0, 0, lastPlane.transform.position.z + length - 0.5f);
 
         if (this.obstacle)
         {
@@ -85,8 +77,10 @@ public class MainPlane : MonoBehaviour
 
         isThisStartPlane = false;
 
-        nextPlane.NextPlane = this;
-        nextPlane = null;
+        Debug.Log(lastPlane.name);
+        nextPlane = lastPlane;
+        lastPlane.backPlane = this;
+        backPlane = null;
     }
 
 }

@@ -22,7 +22,7 @@ public class PlaneCtrl : MonoBehaviour
     {
         foreach (var p in mainPlanes)
         {
-            if(p.NextPlane == null)  {
+            if(p.BackPlane == null)  {
                 return p;
             }
         }

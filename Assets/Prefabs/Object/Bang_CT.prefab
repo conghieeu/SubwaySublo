@@ -76,7 +76,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 28c65cc45fa3ed74c836256f900cfe50,
         type: 3}
       propertyPath: m_Name
-      value: BangChangTren
+      value: Bang_CT
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 28c65cc45fa3ed74c836256f900cfe50,
         type: 3}
@@ -117,5 +117,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4202399, y: 1.9922597, z: 0.33695537}
-  m_Center: {x: 0.014008084, y: 1.9622977, z: 0.04202366}
+  m_Size: {x: 1.4202399, y: 2.0104656, z: 0.4263316}
+  m_Center: {x: 0.014008114, y: 1.9531952, z: -0.0026644554}

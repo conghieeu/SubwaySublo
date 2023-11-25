@@ -36,7 +36,6 @@ public class PlayerCtrl : MonoBehaviour
     void Start()
     {
         indexX = 1;
-        fallSpeed = -500;
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
         playerDeath = GetComponentInChildren<PlayerDeathColl>();
         charCtrl = GetComponent<CharacterController>();
