@@ -35,6 +35,23 @@ public class MainPlane : MonoBehaviour
         IncreaseSpeed();
     }
 
+    public void LoadObstacle()
+    {
+        if (this.obstacle)
+        {
+            planeContainer.addObstacle(this.obstacle);
+        }
+
+        // lấy ngẫu nhiên modun mới từ plane container bỏ vào đây
+        this.obstacle = planeContainer.getObstacle(isThisStartPlane);
+        this.obstacle.transform.SetParent(this.transform);
+        this.obstacle.parentPlane = this;
+        this.obstacle.transform.localPosition = Vector3.zero;
+        this.obstacle.gameObject.SetActive(true);
+
+        isThisStartPlane = false;
+    }
+
     void Move()
     {
         if (planeCtrl.IsStopMovePlane == false)
@@ -63,19 +80,7 @@ public class MainPlane : MonoBehaviour
 
         transform.position = new Vector3(0, 0, lastPlane.transform.position.z + length - 0.5f);
 
-        if (this.obstacle)
-        {
-            planeContainer.addObstacle(this.obstacle);
-        }
-
-        // lấy ngẫu nhiên modun mới từ plane container bỏ vào đây
-        this.obstacle = planeContainer.getObstacle(isThisStartPlane);
-        this.obstacle.transform.SetParent(this.transform);
-        this.obstacle.parentPlane = this;
-        this.obstacle.transform.localPosition = Vector3.zero;
-        this.obstacle.gameObject.SetActive(true);
-
-        isThisStartPlane = false;
+        LoadObstacle();
 
         Debug.Log(lastPlane.name);
         nextPlane = lastPlane;

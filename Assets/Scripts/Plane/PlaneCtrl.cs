@@ -17,6 +17,22 @@ public class PlaneCtrl : MonoBehaviour
 
     }
 
+    private void Start()
+    {
+        LoadObstacle();
+    }
+
+    private void LoadObstacle()
+    {
+        foreach (var p in mainPlanes)
+        { 
+            if(p!=null)
+            {
+                p.LoadObstacle();
+            }
+        }
+    }
+
     /// <summary> Lấy thằng Plane đang nằm cuối </summary>
     public MainPlane getTheLastPlane()
     {
