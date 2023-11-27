@@ -29004,37 +29004,26 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0
-    functionName: PlayAudioRun
+    functionName: PlayClip
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 8300000, guid: 801986f2dfb7240478042fc427899086,
+      type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.125
-    functionName: PlayAudioRun
+  - time: 0.20833333
+    functionName: PlayClip
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 8300000, guid: ad0c74b5e314b924d85e9da0aeb2e823,
+      type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.25
-    functionName: PlayAudioRun
+  - time: 0.41666666
+    functionName: PlayClip
     data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
-  - time: 0.375
-    functionName: PlayAudioRun
-    data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
-  - time: 0.5
-    functionName: PlayAudioRun
-    data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 8300000, guid: a3318e1ae8bd34749bfcbee137076e8a,
+      type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

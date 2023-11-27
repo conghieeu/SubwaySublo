@@ -1,87 +1,59 @@
 using System.Collections;
 using System.Collections.Generic;
+using PauseManagement.Core;
 using UnityEngine;
 
-public class PlayerAnimator : MonoBehaviour
+namespace SubwaySublo.Player
 {
-    public enum state
+    public enum State
     {
-        running = 0,
-        leftTurn = 1,
-        rightTurn = 2,
-        jumping = 3,
-        rolling = 4,
-        death = 5
+        Run = 0,
+        TurnLeft = 1,
+        TurnRight = 2,
+        Jump = 3,
+        Roll = 4,
+        Death = 5
     }
 
-    private state playerState = state.running;
-    private state playerStateTemp;
-
-    PlayerCtrl playerCtrl;
-    Animator animator;
-
-    public state PlayerState { get => playerState; set => playerState = value; }
-
-    void Start()
+    public class PlayerAnimator : MonoBehaviour
     {
-        playerCtrl = GetComponentInParent<PlayerCtrl>();
-        animator = GetComponent<Animator>();
-    }
+        [SerializeField] State animState;
 
-    public void PlayAudioRun()
-    {
-        playerCtrl.PlayerAudio.PlayAudioRunClip();
-    }
+        PlayerCtrl playerCtrl;
+        Animator anim;
 
-    public void RunDeathAnimation()
-    {
-        playerState = state.death;
-        setAnimation();
-    }
+        public State AnimState { get => animState; set => animState = value; }
 
-    public void RunRunningAnimation()
-    {
-        PlayerState = state.running;
-        setAnimation();
-    }
-
-    public void RunRollingAnimation()
-    {
-        PlayerState = state.rolling;
-        setAnimation();
-    }
-
-
-    public void RunTurnLeftAnimation()
-    {
-        PlayerState = state.leftTurn;
-        setAnimation();
-    }
-
-    public void RunTurnRightAnimation()
-    {
-        PlayerState = state.rightTurn;
-        setAnimation();
-    }
-
-    public void OnStopRoll()
-    {
-        RunRunningAnimation();
-        playerCtrl.OnEndRoll();
-    }
-
-    public void RunJumpAnimation()
-    {
-        PlayerState = state.jumping;
-        setAnimation();
-    }
-
-    public void setAnimation()
-    {
-        if (playerState != playerStateTemp)
+        void Start()
         {
-            playerStateTemp = playerState;
-            animator.SetInteger("state", (int)PlayerState);
+            playerCtrl = GetComponentInParent<PlayerCtrl>();
+            anim = GetComponent<Animator>();
+        }
+
+
+
+        public void PlayClip(AudioClip clip) => playerCtrl.playerAudio.PlayClip(clip);
+
+        public bool IsAnimationStop(State state)
+        {
+            if (animState != state) return true;
+            if (anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f && animState == state) return true;
+            return false;
+        }
+
+        public void SetAnimation(State state)
+        {
+            if (animState == state) return;
+            animState = state;
+
+            print("PLAYER ANIMATION: " + state.ToString());
+            anim.Play("Base Layer." + state.ToString(), 0, 0f);
+        }
+
+        public void PauseHandle(bool paused)
+        {
+            if (paused) anim.Play("Base Layer.PauseGame", 0, 0f);
+            else SetAnimation(State.Run);
         }
     }
 }

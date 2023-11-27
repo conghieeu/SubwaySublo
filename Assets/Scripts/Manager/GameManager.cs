@@ -5,6 +5,7 @@ using TMPro;
 using Cinemachine;
 using PauseManagement.Core;
 using SubwaySublo.UI;
+using SubwaySublo.Audio;
 
 public class GameManager : MonoBehaviour
 {
@@ -25,14 +26,11 @@ public class GameManager : MonoBehaviour
     {
         if (Instance != null && Instance != this) Destroy(this);
         else Instance = this;
-
-
     }
 
     void Start()
     {
-        PauseManager.Instance.TogglePause();
-        PauseManager.Instance.enabled = false;
+        PauseManager.Instance.Pause();
     }
 
 
@@ -56,6 +54,7 @@ public class GameManager : MonoBehaviour
         IsEndGame = true;
 
         Debug.Log("END GAME!!");
+        AudioSystem.Instance.PlayAudio(AudioSystem.Instance.clipEndGame);
 
         timer.OnEndGame();
         endGame.OnEndGame();

@@ -20,11 +20,17 @@ public class PlayerAudio : MonoBehaviour
     public AudioClip JumpClip { get => jumpClip; set => jumpClip = value; }
     public AudioClip RunClip { get => runClip; set => runClip = value; }
     public AudioClip MoveClip { get => moveClip; set => moveClip = value; }
-    public AudioSource AudioSource { get => audioSource; set => audioSource = value; }
 
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
+    }
+    
+
+    public void PlayClip(AudioClip clip)
+    {
+        audioSource.clip = clip;
+        audioSource.Play();
     }
 
     public void PlayAudio(AudioClip clip, bool isLoop)
@@ -32,24 +38,22 @@ public class PlayerAudio : MonoBehaviour
         // TRIGGER
         if (audioSource.clip == clip) return;
 
-        AudioSource.loop = isLoop;
-        AudioSource.clip = clip;
-        AudioSource.Play();
+        audioSource.loop = isLoop;
+        audioSource.clip = clip;
+        audioSource.Play();
     }
 
     public void PlayAudioRunClip()
     {
-        AudioSource.clip = runClip;
-        AudioSource.Play();
+        audioSource.clip = runClip;
+        audioSource.Play();
     }
 
-    public void OnPauseGame()
+    public void PauseHandle(bool paused)
     {
-        AudioSource.Pause();
+        if (paused) GetComponent<AudioSource>().Pause();
+        else GetComponent<AudioSource>().Play();
     }
 
-    public void OnResumeGame()
-    {
-        AudioSource.Play();
-    }
+
 }

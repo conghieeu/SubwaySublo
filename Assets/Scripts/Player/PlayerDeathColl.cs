@@ -2,53 +2,50 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerDeathColl : MonoBehaviour
+namespace SubwaySublo.Player
 {
-    [SerializeField] PlayerCtrl playerCtrl;
-
-    [Space]
-    [SerializeField] string targetTag; // Tag của đối tượng muốn phát hiện
-    [SerializeField] Vector3 boxSize;
-
-    public Vector3 BoxSize { get => boxSize; set => boxSize = value; }
-
-    void Start()
+    public class PlayerDeathColl : MonoBehaviour
     {
-        playerCtrl = GetComponentInParent<PlayerCtrl>();
-    }
+        [SerializeField] PlayerCtrl playerCtrl;
 
-    void Update()
-    {
-        playerDeath();
-    }
+        [Space]
+        [SerializeField] string targetTag;
+        [SerializeField] Vector3 boxSize;
 
-    private void playerDeath()
-    {
-        if (BoxCastHit(targetTag))
+        bool isDeath;
+
+        public Vector3 BoxSize { get => boxSize; set => boxSize = value; }
+        public bool IsDeath { get => isDeath; set => isDeath = value; }
+
+        void Start()
         {
-            playerCtrl.SetDeathState();
+            playerCtrl = GetComponentInParent<PlayerCtrl>();
         }
-    }
 
-    protected bool BoxCastHit(string tag)
-    {
-        // Sử dụng Boxcast
-        RaycastHit[] boxcastHits = Physics.BoxCastAll(transform.position, BoxSize / 2f, transform.forward, Quaternion.identity, 0f);
-        foreach (RaycastHit hit in boxcastHits)
+        void Update()
         {
-            if (hit.collider.CompareTag(targetTag))
+            // CHECK THE DEATH
+            if (BoxCastHit(targetTag)) isDeath = true;
+        }
+
+        protected bool BoxCastHit(string tag)
+        {
+            RaycastHit[] boxcastHits = Physics.BoxCastAll(transform.position, BoxSize / 2f, transform.forward, Quaternion.identity, 0f);
+            foreach (RaycastHit hit in boxcastHits)
             {
-                return true;
+                if (hit.collider.CompareTag(targetTag))
+                {
+                    return true;
+                }
             }
+            return false;
         }
-        return false;
-    }
 
-    // Hàm được gọi tự động khi bạn chọn đối tượng trong Scene view
-    protected void OnDrawGizmosSelected()
-    {
-        // Vẽ Boxcast
-        Gizmos.DrawWireCube(transform.position, BoxSize);
-    }
+        // HIỆN BOXCAST KHI TRỎ VÀO
+        protected void OnDrawGizmosSelected()
+        {
+            Gizmos.DrawWireCube(transform.position, BoxSize);
+        }
 
+    }
 }

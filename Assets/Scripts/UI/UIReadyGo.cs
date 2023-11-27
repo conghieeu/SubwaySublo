@@ -28,8 +28,7 @@ public class UIReadyGo : MonoBehaviour
     {
         if (countDownTime <= 0 && blockCountDown == false)
         {
-            PauseManager.Instance.enabled = true;
-            PauseManager.Instance.TogglePause();
+            PauseManager.Instance.Resume();
             txtTime.text = "0";
             timer.gameObject.SetActive(true);
             print("start");

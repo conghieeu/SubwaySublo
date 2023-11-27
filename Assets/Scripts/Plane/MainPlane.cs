@@ -44,10 +44,14 @@ public class MainPlane : MonoBehaviour
 
         // lấy ngẫu nhiên modun mới từ plane container bỏ vào đây
         this.obstacle = planeContainer.getObstacle(isThisStartPlane);
-        this.obstacle.transform.SetParent(this.transform);
-        this.obstacle.parentPlane = this;
-        this.obstacle.transform.localPosition = Vector3.zero;
-        this.obstacle.gameObject.SetActive(true);
+
+        if (this.obstacle)
+        {
+            this.obstacle.transform.SetParent(this.transform);
+            this.obstacle.parentPlane = this;
+            this.obstacle.transform.localPosition = Vector3.zero;
+            this.obstacle.gameObject.SetActive(true);
+        }
 
         isThisStartPlane = false;
     }
@@ -76,7 +80,7 @@ public class MainPlane : MonoBehaviour
 
         MainPlane lastPlane = planeCtrl.getTheLastPlane();
 
-        
+
 
         transform.position = new Vector3(0, 0, lastPlane.transform.position.z + length - 0.5f);
 

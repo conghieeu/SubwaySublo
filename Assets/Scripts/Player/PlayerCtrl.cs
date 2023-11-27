@@ -1,191 +1,219 @@
 using System.Collections;
 using System.Collections.Generic;
 using PauseManagement.Core;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class PlayerCtrl : MonoBehaviour
+namespace SubwaySublo.Player
 {
-    float xRot;
-    Vector2 PlayerMouseInput;
-    Vector3 PlayerMovementInput;
-    Vector3 velocity;
-    int indexX;
-    PlayerAnimator playerAnimator;
-    Transform playerCamera;
-    CharacterController charCtrl;
-    [SerializeField] PlayerDeathColl playerDeath;
-    [SerializeField] PlayerAudio playerAudio;
-
-    [Space]
-    [SerializeField] bool isDeath;
-    [SerializeField] float speed;
-    [SerializeField] float jumpForce = 15;
-    [SerializeField] float gravity = -20;
-    [SerializeField] float fallSpeed = 20;
-    [SerializeField] float moveXSpeed = 90;
-
-    public static PlayerCtrl Instance { get; private set; }
-    public PlayerAudio PlayerAudio { get => playerAudio; set => playerAudio = value; }
-
-    private void Awake()
+    public class PlayerCtrl : MonoBehaviour
     {
-        if (Instance != null && Instance != this) Destroy(this);
-        else Instance = this;
-    }
+        public PlayerAudio playerAudio;
+        public PlayerDeathColl playerDeath;
+        public PlayerAnimator playerAnimator;
 
-    void Start()
-    {
-        indexX = 1;
-        playerAnimator = GetComponentInChildren<PlayerAnimator>();
-        playerDeath = GetComponentInChildren<PlayerDeathColl>();
-        charCtrl = GetComponent<CharacterController>();
-        PlayerAudio = GetComponentInChildren<PlayerAudio>();
-    }
+        [Space]
+        [SerializeField] float speed;
+        [SerializeField] float jumpForce = 15;
+        [SerializeField] float gravity = -20;
+        [SerializeField] float fallSpeed = 20;
+        [SerializeField] float moveXSpeed = 90;
 
-    void Update()
-    {
-        if (isDeath == false)
+        [Header("State")]
+        [SerializeField] bool isRolling;
+        [SerializeField] bool isTurning;
+        [SerializeField] bool isJumping;
+
+        Vector3 PlayerMovementInput;
+        Vector3 velocity;
+        int indexX;
+        CharacterController characterController;
+
+        public static PlayerCtrl Instance { get; private set; }
+
+        private void Awake()
         {
-            if (!PauseManager.IsPaused)
+            if (Instance != null && Instance != this) Destroy(this);
+            else Instance = this;
+        }
+
+        void Start()
+        {
+            indexX = 1;
+            playerAnimator = GetComponentInChildren<PlayerAnimator>();
+            playerDeath = GetComponentInChildren<PlayerDeathColl>();
+            characterController = GetComponent<CharacterController>();
+            playerAudio = GetComponentInChildren<PlayerAudio>();
+
+            PauseManager.PauseAction += PauseHandler;
+        }
+
+        void OnDestroy()
+        {
+            PauseManager.PauseAction -= PauseHandler;
+        }
+
+        void Update()
+        {
+            Behavior();
+        }
+
+        void PauseHandler(bool pause)
+        {
+            playerAudio.PauseHandle(pause);
+            playerAnimator.PauseHandle(pause);
+        }
+
+        void Behavior()
+        {
+            if (!playerDeath.IsDeath)
             {
-                ControlPlayer();
-                MoveX();
-                OnStartRoll();
+                if (!PauseManager.IsPaused)
+                {
+                    Jumping();
+                    Turning();
+                    Rolling();
+                    Running();
+                }
+            }
+            else
+            {
+                Death();
             }
         }
-        else
+
+        void Running()
         {
-            Death();
-        }
-    }
+            if (isTurning || isRolling || isJumping) return;
 
-    private void Death()
-    {
-        velocity.y -= gravity * fallSpeed * Time.deltaTime;
-        charCtrl.Move(velocity * Time.deltaTime);
-
-        GameManager.Instance.EndGame();
-    }
-
-    public void SetDeathState()
-    {
-        PlaneCtrl.Instance.IsStopMovePlane = true;
-        isDeath = true;
-        playerAnimator.RunDeathAnimation();
-
-        print("Player Death");
-        PlayAudio(PlayerAudio.DeathClip, false);
-    }
-
-    void OnStartRoll()
-    {
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            fallSpeed = -20;
-            playerAnimator.RunRollingAnimation();
-            PlayAudio(PlayerAudio.FallClip, false);
-
-            // Setting charCtrl
-            charCtrl.center = new Vector3(0, -0.5f, 0);
-            charCtrl.height = 0.5f;
-            // setting boxCast_death
-            playerDeath.transform.localPosition = new Vector3(0, -0.5f, 0);
-            playerDeath.BoxSize = new Vector3(0.3f, 0.25f, 0.3f);
-
-        }
-    }
-
-    public void OnEndRoll()
-    {
-        // Setting charCtrl
-        charCtrl.center = new Vector3(0, 0, 0);
-        charCtrl.height = 1;
-        // setting boxCast_death
-        playerDeath.transform.localPosition = new Vector3(0, 0f, 0);
-        playerDeath.BoxSize = new Vector3(0.3f, 0.5f, 0.3f);
-    }
-
-    void MoveX()
-    {
-        int[] a = new int[] { -2, 0, 2 };
-        int dir = 0;
-
-        // move x
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            dir = -1;
-            playerAnimator.RunTurnLeftAnimation();
-            PlayAudio(PlayerAudio.MoveClip, false);
-        }
-        else if (Input.GetKeyDown(KeyCode.D))
-        {
-            dir = 1;
-            playerAnimator.RunTurnRightAnimation();
-            PlayAudio(PlayerAudio.MoveClip, false);
+            SetAnimation(State.Run);
         }
 
-        float x = this.transform.position.x;
-
-        if ((indexX + dir) >= 0 && (indexX + dir) <= 2)
+        void Death()
         {
-            indexX = indexX + dir;
-            x = a[indexX];
-        }
+            print("PLAYER DEATH");
 
-        Vector3 pos = this.transform.position;
-        pos.x = x;
-        pos.z = 10;
-        transform.position = Vector3.MoveTowards(this.transform.position, pos, moveXSpeed * Time.deltaTime);
-
-        // Vật thể đã đến đích 
-        if (Vector3.Distance(transform.position, pos) < 0.001f)
-        {
-            if (playerAnimator.PlayerState == PlayerAnimator.state.leftTurn ||
-                playerAnimator.PlayerState == PlayerAnimator.state.rightTurn)
-            {
-                playerAnimator.RunRunningAnimation();
-                PlayerAudio.PlayAudio(PlayerAudio.RunClip, true);
-            }
-        }
-    }
-
-    void ControlPlayer()
-    {
-        Vector3 moveVector = transform.TransformDirection(PlayerMovementInput);
-        PlayerMovementInput = new Vector3(0f, 0f, 1);
-
-        // y -= gravity * -2f * Time.deltaTime;
-        if (charCtrl.isGrounded)
-        {
-            velocity.y = -500 * Time.deltaTime;
-            fallSpeed = -2;
-
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                velocity.y = jumpForce;
-                PlayAudio(PlayerAudio.JumpClip, false);
-            }
-
-            if (playerAnimator.PlayerState == PlayerAnimator.state.jumping)
-            {
-                playerAnimator.RunRunningAnimation();
-            }
-        }
-        else
-        {
-            if (playerAnimator.PlayerState != PlayerAnimator.state.rolling)
-            {
-                playerAnimator.RunJumpAnimation();
-            }
-
+            // SET VELOCITY
             velocity.y -= gravity * fallSpeed * Time.deltaTime;
+            characterController.Move(velocity * Time.deltaTime);
+
+            SetAnimation(State.Death);
+            PlayAudio(playerAudio.DeathClip, false);
+
+            PlaneCtrl.Instance.IsStopMovePlane = true;
+            GameManager.Instance.EndGame();
         }
 
-        charCtrl.Move(moveVector * speed * Time.deltaTime);
-        charCtrl.Move(velocity * Time.deltaTime);
+        void Rolling()
+        {
+            // IN
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                fallSpeed = -20;
+
+                DisableAllState(); isRolling = true;
+                SetAnimation(State.Roll);
+                PlayAudio(playerAudio.FallClip, false);
+
+                // CHANGE SIZE COLLIDER
+                characterController.center = new Vector3(0, -0.5f, 0);
+                characterController.height = 0.5f;
+                // CHANGE SIZE BOXCAST
+                playerDeath.transform.localPosition = new Vector3(0, -0.5f, 0);
+                playerDeath.BoxSize = new Vector3(0.3f, 0.25f, 0.3f);
+            }
+            // OUT
+            else if (playerAnimator.IsAnimationStop(State.Roll))
+            {
+                isRolling = false;
+
+                // RESET SIZE COLLIDER
+                characterController.center = new Vector3(0, 0, 0);
+                characterController.height = 1;
+                // RESET SIZE BOXCAST
+                playerDeath.transform.localPosition = new Vector3(0, 0f, 0);
+                playerDeath.BoxSize = new Vector3(0.3f, 0.5f, 0.3f);
+            }
+        }
+
+        // MOVE LEFT, RIGHT
+        void Turning()
+        {
+            int[] a = new int[] { -2, 0, 2 };
+            int dir = 0;
+            float x = this.transform.position.x;
+
+            // INPUT
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                dir = -1;
+                isTurning = true;
+                PlayAudio(playerAudio.MoveClip, false);
+                SetAnimation(State.TurnLeft);
+            }
+            else if (Input.GetKeyDown(KeyCode.D))
+            {
+                dir = 1;
+                isTurning = true;
+                PlayAudio(playerAudio.MoveClip, false);
+                SetAnimation(State.TurnRight);
+            }
+
+            if ((indexX + dir) >= 0 && (indexX + dir) <= 2)
+            {
+                indexX = indexX + dir;
+                x = a[indexX];
+            }
+
+            Vector3 pos = this.transform.position;
+            pos.x = x;
+            pos.z = 10;
+            transform.position = Vector3.MoveTowards(this.transform.position, pos, moveXSpeed * Time.deltaTime);
+
+            // ĐÃ DI CHUYỄN XONG
+            if (Vector3.Distance(transform.position, pos) < 0.001f)
+            {
+                isTurning = false;
+            }
+        }
+
+        void Jumping()
+        {
+            Vector3 moveVector = transform.TransformDirection(PlayerMovementInput);
+            PlayerMovementInput = new Vector3(0f, 0f, 1);
+
+            if (characterController.isGrounded)
+            {
+                // SET VELOCITY
+                velocity.y = -500 * Time.deltaTime;
+                fallSpeed = -2;
+
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    velocity.y = jumpForce;
+                    PlayAudio(playerAudio.JumpClip, false);
+                }
+
+                isJumping = false;
+            }
+            else
+            {
+                if (!isRolling)
+                {
+                    isJumping = true;
+                    SetAnimation(State.Jump);
+                }
+                velocity.y -= gravity * fallSpeed * Time.deltaTime;
+            }
+
+            characterController.Move(moveVector * speed * Time.deltaTime);
+            characterController.Move(velocity * Time.deltaTime);
+        }
+
+        void DisableAllState() { isJumping = false; isTurning = false; isRolling = false; }
+        void SetAnimation(State state) => playerAnimator.SetAnimation(state);
+        void PlayAudio(AudioClip clip, bool isLoop) => playerAudio.PlayAudio(clip, isLoop);
 
     }
-
-    void PlayAudio(AudioClip clip, bool isLoop) => PlayerAudio.PlayAudio(clip, isLoop);
 
 }
